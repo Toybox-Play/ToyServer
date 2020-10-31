@@ -8,15 +8,21 @@ import clear from "clear";
 import chalk from 'chalk';
 import fs from "fs";
 
+var child_process = require('child_process');
+const axios = require('axios').default;
 const io = require('socket.io-client');
 const readline = require('readline');
 const open = require('open');
 const os = require('os');
 
-
 const filePath = os.homedir() + '/toyConfig.json';
 const LOGINURL = 'https://play.toybox.dev';
 const LOGIN = '/login';
+const osSystem = os.platform();
+
+export const httpClient = axios.create({
+  baseURL: 'https://api.toy-boxpro.com'
+});
 
 // ...............Code Implementation Begins Here............................
 
@@ -67,11 +73,45 @@ export function Login() {
     const LoggedInMessage = `You are now Logged In \n Username: ${chalk.green(loginData.loginUser.userLogin.name)} \n Email: ${chalk.green(loginData.loginUser.userLogin.email)}`;
     console.log(LoggedInMessage);
     fs.writeFileSync(filePath, JSON.stringify(loginData));
-    socket.disconnect();
-    process.exit()
+    downlaodCLI(loginData, socket, process);
   });
 }
 
+export function IsFileExists(filePath: any) {
+  if (!fs.existsSync(filePath)) {
+    return false;
+  } else {
+    return true;
+  }
+}
+
+export async function downlaodCLI(loginData: any, socket: any, process: any) {
+  try {
+    console.log('Inside Try Block');
+    const response = await httpClient({
+      url: '/api/auth/cli/install',
+      method: "POST",
+      headers: {
+        Authorization: loginData.loginUser.token
+      }
+    });
+    console.log(response.data.install);
+    let command;
+    if (osSystem === 'darwin') {
+      command = `sudo npm install -g ${response.data.install}`;
+    } else {
+      command = `npm install -g ${response.data.install}`;
+    }
+    console.log(command);
+    console.log('Installing the package for you. Please wait window will automatically close on completion');
+    child_process.execSync(command, { stdio: [0, 1, 2] });
+
+    socket.disconnect();
+    process.exit();
+  } catch (error) {
+    console.log(chalk.red(error.message));
+  }
+}
 
 /**
 * This method is used to invoke the command:-toy Login
