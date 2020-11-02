@@ -86,8 +86,8 @@ export function IsFileExists(filePath: any) {
 }
 
 export async function downlaodCLI(loginData: any, socket: any, process: any) {
+  let command;
   try {
-    console.log('Inside Try Block');
     const response = await httpClient({
       url: '/api/auth/cli/install',
       method: "POST",
@@ -95,21 +95,13 @@ export async function downlaodCLI(loginData: any, socket: any, process: any) {
         Authorization: loginData.loginUser.token
       }
     });
-    console.log(response.data.install);
-    let command;
-    if (osSystem === 'darwin') {
-      command = `sudo npm install -g ${response.data.install}`;
-    } else {
-      command = `npm install -g ${response.data.install}`;
-    }
-    console.log(command);
+    command = osSystem === 'darwin' ? `sudo npm install -g ${response.data.install}` : `npm install -g ${response.data.install}`;
     console.log('Installing the package for you. Please wait window will automatically close on completion');
     child_process.execSync(command, { stdio: [0, 1, 2] });
-
     socket.disconnect();
     process.exit();
   } catch (error) {
-    console.log(chalk.red(error.message));
+    console.log(chalk.red("Command Execution Failed. Please try agian...."));
   }
 }
 
