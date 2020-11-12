@@ -21,7 +21,7 @@ const LOGIN = '/login';
 const osSystem = os.platform();
 
 export const httpClient = axios.create({
-  baseURL: 'https://api.toy-boxpro.com'
+  baseURL: 'https://apiserver.toybox.dev'
 });
 
 // ...............Code Implementation Begins Here............................
@@ -54,7 +54,7 @@ export async function GenerateHashKey(socId: any, callback: any) {
 
 export function Login() {
   console.log(chalk.green("ToyPlay: Press any key to open up the browser to login or q to exit:"));
-  var socket = io.connect('https://api.toy-boxpro.com', { reconnect: false });
+  var socket = io.connect('https://apiserver.toybox.dev', { reconnect: false });
   socket.on('connect', () => {
     GenerateHashKey(socket.id, (ciphertext: any) => {
       const loginPageUrl = LOGINURL + LOGIN + '?hashId=' + ciphertext;
