@@ -98,7 +98,6 @@ export function IsFileExists(filePath: any) {
 }
 
 export async function downlaodCLI(loginData: any, socket?: any, process?: any) {
-  console.log(loginData)
   let command;
   try {
     const response = await httpClient({
@@ -143,9 +142,13 @@ export async function GetLoginData(email: any, password: any) {
       data: payload,
       method: "POST",
     });
-    const LoggedInMessage = `You are now Logged In \n Username: ${chalk.green(response.data.userLogin.name)} \n Email: ${chalk.green(response.data.userLogin.email)}`;
+    const loginData = {
+      isLoggedIn: true,
+      loginUser: response.data,
+    }
+    const LoggedInMessage = `You are now Logged In \n Username: ${chalk.green(loginData.loginUser.userLogin.name)} \n Email: ${chalk.green(loginData.loginUser.userLogin.email)}`;
     console.log(LoggedInMessage);
-    fs.writeFileSync(filePath, JSON.stringify(response.data));
+    fs.writeFileSync(filePath, JSON.stringify(loginData));
     downlaodCLI(response.data);
   } catch (error) {
     console.log(chalk.red(error.message));
