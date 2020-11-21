@@ -107,7 +107,6 @@ export async function downlaodCLI(loginData: any, socket?: any, process?: any) {
         Authorization: loginData.token
       }
     });
-    console.log(response.data);
     command = osSystem === 'darwin' ? `sudo npm install -g ${response.data.install}` : `npm install -g ${response.data.install}`;
     console.log('Installing the package for you. Please wait window will automatically close on completion');
     child_process.execSync(command, { stdio: [0, 1, 2] });
