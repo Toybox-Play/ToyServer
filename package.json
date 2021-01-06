@@ -2,9 +2,9 @@
   "name": "toyserver",
   "version": "1.0.0",
   "description": "ToyServer to install the ToyBox CLI in user system",
-  "main": "./lib/index.js",
+  "main": "./lib/src/index.js",
   "bin": {
-    "toyserver": "./lib/index.js"
+    "toyserver": "./lib/src/index.js"
   },
   "scripts": {
     "init": "npm init",

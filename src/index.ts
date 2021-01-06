@@ -20,19 +20,20 @@ const filePath = os.homedir() + '/toyConfig.json';
 const LOGINURL = 'https://play.toybox.dev';
 const LOGIN = '/login';
 const osSystem = os.platform();
+
 let userNameQ = [{
   type: "input",
   name: "email",
   message: "email:",
 }];
-
 let passwordQ = [{
   type: "password",
   name: "password",
   message: "password:",
 }];
+
 export const httpClient = axios.create({
-  baseURL: 'https://apiserver.toybox.dev'
+  baseURL: 'https://dev-api.toybox.dev'
 });
 
 // ...............Code Implementation Begins Here............................
@@ -48,6 +49,68 @@ export function ToyLog(): void {
   );
   console.log('Usage: toyserver install cli:- To install the Toy CLI globally in user system');
 }
+
+export async function downlaodCLI(loginData: any, socket?: any, process?: any) {
+  try {
+    const response = await httpClient({
+      url: '/auth/install',
+      method: "POST",
+      headers: {
+        Authorization: loginData.loginUser.refreshToken
+      }
+    });
+    let command = osSystem === 'darwin' ? `sudo npm install -g ${response.data.install}` : `npm install -g ${response.data.install}`;
+    console.log('Installing the package for you. Please wait window will automatically close on completion');
+    child_process.execSync(command, { stdio: [0, 1, 2] });
+    // socket.disconnect();
+    // process.exit();
+  } catch (error) {
+    console.log(chalk.red("Command Execution Failed. Please try agian...."));
+  }
+}
+
+/**This method is invoked on the command "toyserver install cli" */
+export function CMDLogin(): void {
+  let email = '';
+  let password = '';
+  inquirer.prompt(userNameQ).then((answer: any) => {
+    email = answer.email;
+    inquirer.prompt(passwordQ).then((answer: any) => {
+      password = answer.password;
+      GetLoginData(email, password);
+    });
+  });
+}
+
+export async function GetLoginData(email: any, password: any) {
+  const payload = {
+    email: email,
+    password: password
+  };
+  try {
+    const response = await httpClient({
+      url: '/toybox/signin',
+      data: payload,
+      method: "POST",
+    });
+    const loginData = {
+      isLoggedIn: true,
+      loginUser: response.data,
+    }
+    const LoggedInMessage = `You are now Logged In \n Username: ${chalk.green(loginData.loginUser['custom:firstName'] + loginData.loginUser['custom:lastName'])} \n Email: ${chalk.green(loginData.loginUser['cognito:username'])}`;
+    console.log(LoggedInMessage);
+    fs.writeFileSync(filePath, JSON.stringify(loginData));
+    downlaodCLI(loginData);
+  } catch (error) {
+    console.log(chalk.red(error.message));
+  }
+}
+
+
+
+/**
+ * Below Methods are created for the future Use and not used anywhere in the current implementation
+ */
 
 /**
  * function to generate Hash key
@@ -96,63 +159,9 @@ export function IsFileExists(filePath: any) {
     return true;
   }
 }
-
-export async function downlaodCLI(loginData: any, socket?: any, process?: any) {
-  let command;
-  try {
-    const response = await httpClient({
-      url: '/api/auth/cli/install',
-      method: "POST",
-      headers: {
-        Authorization: loginData.token
-      }
-    });
-    command = osSystem === 'darwin' ? `sudo npm install -g ${response.data.install}` : `npm install -g ${response.data.install}`;
-    console.log('Installing the package for you. Please wait window will automatically close on completion');
-    child_process.execSync(command, { stdio: [0, 1, 2] });
-    // socket.disconnect();
-    // process.exit();
-  } catch (error) {
-    console.log(chalk.red("Command Execution Failed. Please try agian...."));
-  }
-}
-
-
-export function CMDLogin() {
-  let email = '';
-  let password = '';
-  inquirer.prompt(userNameQ).then((answer: any) => {
-    email = answer.email;
-    inquirer.prompt(passwordQ).then((answer: any) => {
-      password = answer.password;
-      GetLoginData(email, password);
-    });
-  });
-}
-
-export async function GetLoginData(email: any, password: any) {
-  const payload = {
-    email: email,
-    password: password
-  };
-  try {
-    const response = await httpClient({
-      url: '/api/auth/login',
-      data: payload,
-      method: "POST",
-    });
-    const loginData = {
-      isLoggedIn: true,
-      loginUser: response.data,
-    }
-    const LoggedInMessage = `You are now Logged In \n Username: ${chalk.green(loginData.loginUser.userLogin.name)} \n Email: ${chalk.green(loginData.loginUser.userLogin.email)}`;
-    console.log(LoggedInMessage);
-    fs.writeFileSync(filePath, JSON.stringify(loginData));
-    downlaodCLI(response.data);
-  } catch (error) {
-    console.log(chalk.red(error.message));
-  }
-}
+/**
+ *  Methods created for the future Use and not used anywhere in the current implementation ends here 
+ */
 
 /**
 * This method is used to invoke the command:-toy Login
@@ -165,6 +174,5 @@ program
     // Login()
     CMDLogin();
   });
-
 program.parse(process.argv);
 //Code Implementation Ends Here
