@@ -50,25 +50,6 @@ export function ToyLog(): void {
   console.log('Usage: toyserver install cli:- To install the Toy CLI globally in user system');
 }
 
-export async function downlaodCLI(loginData: any, socket?: any, process?: any) {
-  try {
-    const response = await httpClient({
-      url: '/auth/install',
-      method: "POST",
-      headers: {
-        Authorization: loginData.loginUser.refreshToken
-      }
-    });
-    let command = osSystem === 'darwin' ? `sudo npm install -g ${response.data.install}` : `npm install -g ${response.data.install}`;
-    console.log('Installing the package for you. Please wait window will automatically close on completion');
-    child_process.execSync(command, { stdio: [0, 1, 2] });
-    // socket.disconnect();
-    // process.exit();
-  } catch (error) {
-    console.log(chalk.red("Command Execution Failed. Please try agian...."));
-  }
-}
-
 /**This method is invoked on the command "toyserver install cli" */
 export function CMDLogin(): void {
   let email = '';
@@ -93,9 +74,11 @@ export async function GetLoginData(email: any, password: any) {
       data: payload,
       method: "POST",
     });
+    const subscription = await GetSubscription(response);
     const loginData = {
       isLoggedIn: true,
       loginUser: response.data,
+      subscription: subscription.data
     }
     const LoggedInMessage = `You are now Logged In \n Username: ${chalk.green(loginData.loginUser['custom:firstName'] + loginData.loginUser['custom:lastName'])} \n Email: ${chalk.green(loginData.loginUser['cognito:username'])}`;
     console.log(LoggedInMessage);
@@ -106,7 +89,38 @@ export async function GetLoginData(email: any, password: any) {
   }
 }
 
+export async function GetSubscription(response: any) {
+  const subPayload = {
+    'id': response.data['cognito:username']
+  };
+  return httpClient({
+    url: '/users/fetch',
+    data: subPayload,
+    method: "POST",
+    headers: {
+      Authorization: `Bearer ${response.data.idToken}`
+    }
+  });
+}
 
+export async function downlaodCLI(loginData: any, socket?: any, process?: any) {
+  try {
+    const response = await httpClient({
+      url: '/auth/install',
+      method: "POST",
+      headers: {
+        Authorization: loginData.loginUser.idToken
+      }
+    });
+    let command = osSystem === 'darwin' ? `sudo npm install -g ${response.data.install}` : `npm install -g ${response.data.install}`;
+    console.log('Installing the package for you. Please wait window will automatically close on completion');
+    child_process.execSync(command, { stdio: [0, 1, 2] });
+    // socket.disconnect();
+    // process.exit();
+  } catch (error) {
+    console.log(chalk.red("Command Execution Failed. Please try agian...."));
+  }
+}
 
 /**
  * Below Methods are created for the future Use and not used anywhere in the current implementation
