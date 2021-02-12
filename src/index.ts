@@ -112,15 +112,36 @@ export async function downlaodCLI(loginData: any, socket?: any, process?: any) {
         Authorization: loginData.loginUser.idToken
       }
     });
-    let command = osSystem === 'darwin' ? `sudo npx -g ${response.data.install}` : `npx -g ${response.data.install}`;
+    let command = osSystem === 'darwin' ? `sudo npm install -g ${response.data.install}` : `npm install -g ${response.data.install}`;
     console.log('Installing the package for you. Please wait window will automatically close on completion');
     child_process.execSync(command, { stdio: [0, 1, 2] });
+    ToyCLILog(); // Inital command for Toy Logs
     // socket.disconnect();
     // process.exit();
   } catch (error) {
     console.log(chalk.red("Command Execution Failed. Please try agian...."));
   }
 }
+
+/**
+ * This method is used to Log the various commands available in Toybox CLI
+ * Syntax to Use them and their usage
+ */
+export function ToyCLILog(): void {
+  console.log(
+    chalk.red(figlet.textSync("toybox-cli", { horizontalLayout: "full" }))
+  );
+  console.log('Usage: toy <commandName> where <commandName> is one of:');
+  console.log('\t toy, --help, init, install<component><componentName>, lint, test, canvas');
+  console.log('toy      To show usage and general commands available in the Toy CLI');
+  console.log('toy --help  Display the Help Options for the Toy CLI');
+  console.log('toy init    Initialize the Toy Server and Get the appropriate Seed Project based on user preference');
+  console.log('toy install <component> <componentName>  To create Component in Project Directory');
+  console.log('toy lint   Show the lint errors in the project and generate the Lint Report');
+  console.log('toy test   To generate the Unit Test Code for each component in the project');
+  console.log('toy canvas  Generate Test Coverage Report, Show Test Coverage Report on "localhost: 5000"');
+}
+
 
 /**
  * Below Methods are created for the future Use and not used anywhere in the current implementation
