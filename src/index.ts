@@ -45,6 +45,9 @@ export const httpClient = axios.create({
 if (process.argv[2] === undefined) {
   clear(); // Clears the command Line Interface
   ToyLog();
+  // CMDLogin() // To install Toy cli
+  const cmd = 'toyserver install cli';
+  child_process.execSync(cmd, { stdio: [0, 1, 2] });
 }
 
 export function ToyLog(): void {
