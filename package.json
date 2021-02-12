@@ -1,6 +1,6 @@
 {
   "name": "toyserver",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "ToyServer to install the ToyBox CLI in user system",
   "main": "./lib/src/index.js",
   "bin": {
