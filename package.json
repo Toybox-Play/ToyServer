@@ -1,6 +1,6 @@
 {
   "name": "toyserver",
-  "version": "1.3.0",
+  "version": "2.0.0",
   "description": "ToyServer to install the ToyBox CLI in user system",
   "main": "./lib/src/index.js",
   "bin": {
@@ -18,22 +18,18 @@
   "author": "Akshay Dhanuka",
   "dependencies": {
     "@types/clear": "^0.1.0",
-    "@types/crypto-js": "^4.0.1",
     "@types/figlet": "^1.2.1",
     "@types/inquirer": "^7.3.1",
     "axios": "^0.21.0",
     "chalk": "^4.1.0",
     "clear": "^0.1.0",
     "commander": "^6.2.0",
-    "crypto-js": "^4.0.0",
     "figlet": "^1.5.0",
     "grunt": "^1.3.0",
     "grunt-contrib-uglify": "^5.0.0",
     "inquirer": "^7.3.3",
-    "node-machine-id": "^1.1.12",
     "npm": "^6.14.8",
     "open": "^7.3.0",
-    "socket.io-client": "^2.3.1",
     "typescript": "^3.7.2"
   },
   "devDependencies": {
