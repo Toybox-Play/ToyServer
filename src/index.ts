@@ -89,7 +89,6 @@ export async function GetLoginData(email: any, password: any) {
 }
 
 export async function GetSubscription(data: any) {
-  console.log(data);
   const subPayload = {
     id: data['cognito:username'],
   };
